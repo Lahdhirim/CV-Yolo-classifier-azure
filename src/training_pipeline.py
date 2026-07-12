@@ -4,7 +4,8 @@ import time
 from pathlib import Path
 
 from src.base_pipeline import BasePipeline
-from src.data_models.training_result import TrainingResult, TrainStatus
+from src.data_models.training_result import TrainingTracker, TrainStatus
+from src.training.evaluate import Evaluator
 from src.training.preprocess import DatasetProcessor
 from src.training.train import YoloTrainer
 from src.utils.logger import training_logger as logger
@@ -16,6 +17,7 @@ class TrainingPipeline(BasePipeline):
     def __init__(self, config: dict):
         super().__init__(config)
 
+        # Load configuration parameters
         data_config = self.config.get("data", {})
         self.input_dir = data_config.get("input_dir", None)
         self.img_size = tuple(data_config.get("img_size", [640, 640]))
@@ -53,11 +55,14 @@ class TrainingPipeline(BasePipeline):
         )
 
         # Initialize output directory for training results
-        self.training_results: dict[str, TrainingResult] = {}
+        self.training_results: dict[str, TrainingTracker] = {}
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         self.experiment_id = f"experiment_{timestamp}"
         self.output_dir = Path("outputs") / self.experiment_id
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Initialize evaluator for model evaluation
+        self.evaluator = Evaluator(data_path="./dataset", output_dir=self.output_dir)
 
     def _save_training_results(self) -> None:
         """Save all training results as a pickle file."""
@@ -90,44 +95,44 @@ class TrainingPipeline(BasePipeline):
         for model_name in self.models:
             logger.info(f"[TRAINING] Training model: {model_name}")
 
-            # Create training result object
-            training_result = TrainingResult(
+            # Create training tracker object
+            training_tracker = TrainingTracker(
                 model_name=model_name,
                 run_path=f"{model_name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
             )
 
             # Train the model
             start_time = time.time()
-            status, error_message = self.trainer.train(
-                model_name=training_result.model_name,
-                model_path=training_result.run_path,
-            )
+            training_tracker = self.trainer.train(model_tracker=training_tracker)
             end_time = time.time()
-
-            # Update training result
-            training_result.time_taken = end_time - start_time
-            training_result.status = status
-            training_result.error_message = error_message
+            training_tracker.time_taken = end_time - start_time
 
             # Evaluate the model
-            if status == TrainStatus.COMPLETED.value:
-                # Here you would implement the evaluation logic to get the best and last accuracies
-                # For now, we will just set them to None or some dummy values
-                training_result.val_accuracy_best = (
-                    None  # Replace with actual evaluation logic
+            if training_tracker.status == TrainStatus.COMPLETED.value:
+
+                # Validation Set
+                val_preds = self.evaluator.predict(
+                    model_tracker=training_tracker, split="val"
                 )
-                training_result.val_accuracy_last = (
-                    None  # Replace with actual evaluation logic
+                val_metrics = self.evaluator.compute_metrics(predictions=val_preds)
+
+                # Test Set
+                test_preds = self.evaluator.predict(
+                    model_tracker=training_tracker, split="test"
                 )
-                training_result.test_accuracy_best = (
-                    None  # Replace with actual evaluation logic
-                )
-                training_result.test_accuracy_last = (
-                    None  # Replace with actual evaluation logic
+                test_metrics = self.evaluator.compute_metrics(predictions=test_preds)
+
+                # Save Results in Excel file
+                self.evaluator.save_results_to_excel(
+                    model_tracker=training_tracker,
+                    val_predictions=val_preds,
+                    val_metrics=val_metrics,
+                    test_predictions=test_preds,
+                    test_metrics=test_metrics,
                 )
 
             # Store the training result
-            self.training_results[model_name] = training_result
+            self.training_results[model_name] = training_tracker
 
         # Save training results to pkl file
         self._save_training_results()

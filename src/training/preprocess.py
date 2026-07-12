@@ -78,7 +78,7 @@ class DatasetProcessor:
             f"[LOADING] Finished loading images. Processed folders: {processed_folders}, Failed folders: {failed_folders}, Processed images: {processed_images}, Failed images: {failed_images}"
         )
 
-    def split_dataset(self):
+    def split_dataset(self) -> None:
         processed_images, failed_images = 0, 0
 
         for classe, images in self.images.items():

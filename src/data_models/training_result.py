@@ -9,13 +9,12 @@ class TrainStatus(str, Enum):
 
 
 @dataclass
-class TrainingResult:
+class TrainingTracker:
     model_name: str
     run_path: str
     time_taken: float = 0
     val_accuracy_best: float = None
-    val_accuracy_last: float = None
     test_accuracy_best: float = None
-    test_accuracy_last: float = None
     status: TrainStatus = TrainStatus.NOT_STARTED
     error_message: str = None
+    train_metrics: dict = None

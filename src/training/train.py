@@ -1,7 +1,7 @@
 import torch
 from ultralytics import YOLO
 
-from src.data_models.training_result import TrainStatus
+from src.data_models.training_result import TrainingTracker, TrainStatus
 from src.utils.logger import training_logger as logger
 
 
@@ -46,14 +46,14 @@ class YoloTrainer:
             )
             return None
 
-    def train(self, model_name: str, model_path: str) -> None:
+    def train(self, model_tracker: TrainingTracker) -> TrainingTracker:
         logger.info(
-            f"[TRAINING - {model_name}] Starting training with the following parameters: epochs={self.epochs}, imgsz={self.imgsz}, batch_size={self.batch_size}, learning_rate={self.learning_rate}, optimizer={self.optimizer}, device={'GPU' if self.device is not None else 'CPU'}, num_workers={self.num_workers}"
+            f"[TRAINING - {model_tracker.model_name}] Starting training with the following parameters: epochs={self.epochs}, imgsz={self.imgsz}, batch_size={self.batch_size}, learning_rate={self.learning_rate}, optimizer={self.optimizer}, device={'GPU' if self.device is not None else 'CPU'}, num_workers={self.num_workers}"
         )
 
         try:
-            model = YOLO(model_name)
-            model.train(
+            model = YOLO(model_tracker.model_name)
+            train_metrics = model.train(
                 data=self.data,
                 epochs=self.epochs,
                 imgsz=self.imgsz,
@@ -64,13 +64,22 @@ class YoloTrainer:
                 project="runs",
                 device=self.device,
                 workers=self.num_workers,
-                name=model_path,
+                name=model_tracker.run_path,
             )
+
             logger.info(
-                f"[TRAINING - {model_name}] Training completed successfully. Model saved at: runs/{model_path}"
+                f"[TRAINING - {model_tracker.model_name}] Training completed successfully. Model saved at: runs/{model_tracker.run_path}"
             )
-            return TrainStatus.COMPLETED.value, None
+            model_tracker.status = TrainStatus.COMPLETED.value
+            model_tracker.error_message = None
+            model_tracker.train_metrics = train_metrics
+            return model_tracker
 
         except Exception as e:
-            logger.error(f"[TRAINING - {model_name}] Training failed with error: {e}")
-            return TrainStatus.FAILED.value, str(e)
+            logger.error(
+                f"[TRAINING - {model_tracker.model_name}] Training failed with error: {e}"
+            )
+            model_tracker.status = TrainStatus.FAILED.value
+            model_tracker.error_message = str(e)
+            model_tracker.train_metrics = None
+            return model_tracker

@@ -10,6 +10,8 @@ dependencies = [
     "torch",
     "torchvision",
     "typer>=0.26.8",
+    "pandas>=3.0.3",
+    "openpyxl>=3.1.5",
 ]
 
 [tool.uv.sources]
