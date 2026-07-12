@@ -49,9 +49,9 @@ class DatasetProcessor:
             # Collect all image files in the class folder
             images = []
             for image_index, image_name in enumerate(sorted(os.listdir(class_folder))):
-                logger.info(
-                    f"[LOADING] Processing image {image_index + 1}/{len(os.listdir(class_folder))}"
-                )
+                # logger.info(
+                #     f"[LOADING] Processing image {image_index + 1}/{len(os.listdir(class_folder))}"
+                # )
 
                 if not image_name.lower().endswith(
                     (".jpg", ".jpeg", ".png", ".webp", ".avif")

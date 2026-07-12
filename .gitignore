@@ -9,6 +9,12 @@ wheels/
 # Virtual environments
 .venv
 
+# VS Code settings
+.ruff_cache/
+
+# Pytorch files
+*.pt
+
 # Folders
 data_raw/
 dataset/

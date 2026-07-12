@@ -1,5 +1,12 @@
+import datetime
+import pickle
+import time
+from pathlib import Path
+
 from src.base_pipeline import BasePipeline
+from src.data_models.training_result import TrainingResult, TrainStatus
 from src.training.preprocess import DatasetProcessor
+from src.training.train import YoloTrainer
 from src.utils.logger import training_logger as logger
 
 
@@ -24,10 +31,103 @@ class TrainingPipeline(BasePipeline):
             val_ratio=self.val_ratio,
         )
 
+        training_config = self.config.get("training", {})
+        self.models = training_config.get("models", ["yolov8m-cls"])
+        self.epochs = training_config.get("epochs", 10)
+        self.batch_size = training_config.get("batch_size", 8)
+        self.learning_rate = training_config.get("learning_rate", 1e-4)
+        self.optimizer = training_config.get("optimizer", "adamW")
+
+        device_config = self.config.get("device", {})
+        self.enable_gpu = device_config.get("use_gpu", False)
+        self.num_workers = device_config.get("num_workers", 0)
+        self.trainer = YoloTrainer(
+            data="./dataset",
+            epochs=self.epochs,
+            imgsz=self.img_size[0],
+            batch_size=self.batch_size,
+            learning_rate=self.learning_rate,
+            optimizer=self.optimizer,
+            enable_gpu=self.enable_gpu,
+            num_workers=self.num_workers,
+        )
+
+        # Initialize output directory for training results
+        self.training_results: dict[str, TrainingResult] = {}
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.experiment_id = f"experiment_{timestamp}"
+        self.output_dir = Path("outputs") / self.experiment_id
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _save_training_results(self) -> None:
+        """Save all training results as a pickle file."""
+        output_file = self.output_dir / "training_results.pkl"
+        try:
+            with output_file.open("wb") as file:
+                pickle.dump(self.training_results, file)
+            logger.info(
+                f"[TRAINING] Training results saved successfully: {output_file}"
+            )
+
+        except (OSError, pickle.PickleError) as error:
+            logger.exception(f"[TRAINING] Failed to save training results: {error}")
+            raise
+
     def run(self) -> None:
         """run the training pipeline."""
         logger.info(f"Running training pipeline with config: {self.config}")
+        logger.info(f"Experiment ID: {self.experiment_id}")
+        logger.info(f"Experiment output directory: {self.output_dir}")
 
-        # Load and preprocess the dataset
-        self.dataset_processor.load_images()
-        self.dataset_processor.split_dataset()
+        # Load and split the dataset
+        # self.dataset_processor.load_images()
+        # self.dataset_processor.split_dataset()
+
+        # Train all the models
+        assert Path(
+            "./dataset"
+        ).exists(), "Dataset directory does not exist. Cannot proceed with training."
+        for model_name in self.models:
+            logger.info(f"[TRAINING] Training model: {model_name}")
+
+            # Create training result object
+            training_result = TrainingResult(
+                model_name=model_name,
+                run_path=f"{model_name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            )
+
+            # Train the model
+            start_time = time.time()
+            status, error_message = self.trainer.train(
+                model_name=training_result.model_name,
+                model_path=training_result.run_path,
+            )
+            end_time = time.time()
+
+            # Update training result
+            training_result.time_taken = end_time - start_time
+            training_result.status = status
+            training_result.error_message = error_message
+
+            # Evaluate the model
+            if status == TrainStatus.COMPLETED.value:
+                # Here you would implement the evaluation logic to get the best and last accuracies
+                # For now, we will just set them to None or some dummy values
+                training_result.val_accuracy_best = (
+                    None  # Replace with actual evaluation logic
+                )
+                training_result.val_accuracy_last = (
+                    None  # Replace with actual evaluation logic
+                )
+                training_result.test_accuracy_best = (
+                    None  # Replace with actual evaluation logic
+                )
+                training_result.test_accuracy_last = (
+                    None  # Replace with actual evaluation logic
+                )
+
+            # Store the training result
+            self.training_results[model_name] = training_result
+
+        # Save training results to pkl file
+        self._save_training_results()
