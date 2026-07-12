@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+      
+      - id: ruff
+        name: ruff lint
+        entry: ruff check . --fix --select E,F,I --ignore E501
+        language: system
+        types: [python]
