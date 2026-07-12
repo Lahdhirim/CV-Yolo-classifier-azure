@@ -1,0 +1,23 @@
+# Training Configuration
+
+# Data settings
+data:
+  input_dir: ./data_raw
+  img_size: [640, 640]
+  train_ratio: 0.7
+  val_ratio: 0.15
+
+# Training settings
+training:
+  batch_size: 8
+  epochs: 2
+  learning_rate: 0.001
+  optimizer: adamW
+
+# Device settings
+device:
+  use_gpu: true
+  num_workers: 0
+
+# Random seed
+seed: 42

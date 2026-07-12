@@ -1,13 +1,15 @@
+import time
 from pathlib import Path
+
 import typer
 import yaml
-import time
 
 from src.training_pipeline import TrainingPipeline
 from src.utils.logger import logger
 
 app = typer.Typer(name="Yolo Classifier")
 logger.info("Starting YOLO Classifier CLI application.")
+
 
 @app.command(name="train")
 def train(
@@ -36,6 +38,7 @@ def train(
     pipeline.run()
     end_time = time.time()
     logger.info(f"Training pipeline completed in {end_time - start_time:.2f} seconds.")
+
 
 if __name__ == "__main__":
     app()
