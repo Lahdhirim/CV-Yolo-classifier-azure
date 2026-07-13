@@ -115,6 +115,23 @@ class Evaluator:
             "per_class_accuracy": per_class_accuracy,
         }
 
+    @staticmethod
+    def _compute_confusion_matrix(predictions: list[dict]) -> pd.DataFrame:
+        """Compute confusion matrix from predictions."""
+
+        predictions_df = pd.DataFrame(predictions)
+
+        if predictions_df.empty:
+            return pd.DataFrame()
+
+        return pd.crosstab(
+            predictions_df["true_class"],
+            predictions_df["prediction"],
+            rownames=["True class"],
+            colnames=["Predicted class"],
+            dropna=False,
+        )
+
     def save_results_to_excel(
         self,
         model_tracker: TrainingTracker,
@@ -159,6 +176,11 @@ class Evaluator:
                 accuracy,
             ]
 
+        # Confusion matrix
+        val_confusion_matrix = self._compute_confusion_matrix(val_predictions)
+
+        test_confusion_matrix = self._compute_confusion_matrix(test_predictions)
+
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             val_predictions_df.to_excel(
                 writer,
@@ -172,6 +194,11 @@ class Evaluator:
                 index=False,
             )
 
+            val_confusion_matrix.to_excel(
+                writer,
+                sheet_name="val_confusion",
+            )
+
             test_predictions_df.to_excel(
                 writer,
                 sheet_name="test_predictions",
@@ -182,6 +209,11 @@ class Evaluator:
                 writer,
                 sheet_name="test_metrics",
                 index=False,
+            )
+
+            test_confusion_matrix.to_excel(
+                writer,
+                sheet_name="test_confusion",
             )
 
         logger.info(f"[EVALUATOR] Results saved to: {output_file}")
