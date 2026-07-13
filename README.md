@@ -19,15 +19,15 @@ The dataset used in this project is a collection of images of Tunisian food dish
 
 | Assida | Baklava | Brik | Chapati |
 |:-------:|:----------:|:----:|:--------:|
-| <img src="dataset/train/assida/1.jpg" width="180"> | <img src="dataset/train/baklava/3.jpg" width="180"> | <img src="dataset/train/brik/3.jpg" width="180"> | <img src="dataset/train/chapati/2.jpg" width="180"> |
+| <img src="imgs/assida.jpg" width="180"> | <img src="imgs/baklava.jpg" width="180"> | <img src="imgs/brik.jpg" width="180"> | <img src="imgs/chapati.jpg" width="180"> |
 
 | Couscous | Fricasse | Ghraiba | Kaak Warka |
 |:---------:|:-------:|:--------:|:---------:|
-| <img src="dataset/train/couscous/8.jpg" width="180"> | <img src="dataset/train/fricasse/2.jpg" width="180"> | <img src="dataset/train/ghraiba/1.jpg" width="180"> | <img src="dataset/train/kaak_warka/1.jpg" width="180"> |
+| <img src="imgs/couscous.jpg" width="180"> | <img src="imgs/fricasse.jpg" width="180"> | <img src="imgs/ghraiba.jpg" width="180"> | <img src="imgs/kaak_warka.jpg" width="180"> |
 
 | Leblebi | Makroud | Mloukhia |
 |:----:|:--------------:|:------:|
-| <img src="dataset/train/lablebi/1.jpg" width="180"> | <img src="dataset/train/makroud/4.jpg" width="180"> | <img src="dataset/train/mloukhia/1.jpg" width="180"> |
+| <img src="imgs/lablebi.jpg" width="180"> | <img src="imgs/makroud.jpg" width="180"> | <img src="imgs/mloukhia.jpg" width="180"> |
 
 The total 1100 images are split into training, validation, and test sets as follows:
 - Training set: 70% (770 images, with 70 images per class)
