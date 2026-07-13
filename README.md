@@ -80,8 +80,13 @@ The configuration of the training experiment are as follows:
 
 As shown in the above figures, the best-performing models are the `x` variants of the YOLO family, achieving the highest accuracy on both the validation and test sets. This is expected since the `x` models have the largest capacity (more parameters and higher representational power), allowing them to learn more complex visual features from the dataset. Among them, **`yolo11x-cls` achieves the best performance with a 97% test accuracy**.
 
+### Confusion matrix for the best model Yolo11x-cls:
+<div style="text-align: center;">
+    <img src="outputs/experiment_20260713_104836//yolo11x-cls/confusion_matrix.png" alt="Confusion Matrix"/>
+</div>
+
 ## Bring Your Own Dataset
-The project is **not limited to Tunisian food classification**. The entire training pipeline has been designed to be reusable for any image classification problem. Simply clone the repository and replace the dataset with your own.
+The project is **not limited to food classification**. The entire training pipeline has been designed to be reusable for any image classification problem. Simply clone the repository and replace the dataset with your own.
 
 The only requirement is to organize your images with **one folder per class** inside the `data_raw` directory:
 
