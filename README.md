@@ -2,7 +2,7 @@
 
 This project provides a simple and reproducible pipeline for fine-tuning the **YOLO Classification (YOLO-CLS)** models on custom image classification datasets.
 
-The best-performing top 3 models achieves high accuracy:
+The top three best-performing models achieve high accuracy:
 
 <div align="center">
 
@@ -40,7 +40,8 @@ The total 1100 images are split into training, validation, and test sets as foll
 
 The training pipeline contains all the necessary steps to train a YOLO-CLS model on a custom dataset. It includes data preprocessing, train/validation/test split, model training, and evaluation. The pipeline is designed to be modular and easily configurable through the [configs/train.yaml](configs/train.yaml) configuration file.
 
-Here is some of the most important parameters in the configuration file:
+Here are some of the most important parameters in the configuration file:
+
 | Parameter                  | Type    | Description |
 |----------------------------|---------|-------------|
 | `img_size`             | tuple     | The size of the input images for the model. |
@@ -50,14 +51,34 @@ Here is some of the most important parameters in the configuration file:
 
 The main steps of the training pipeline are as follows:
 1. **Data Preprocessing**: The images are loaded from the `input_dir` directory and resized to the specified `img_size`. A new directory `dataset` is created to store three subdirectories: `train`, `val`, and `test`, each containing the corresponding images for training, validation, and testing.
-2. **Model Training and Evaluation**: For each model specified in the `models` list, the model is trained on the training set and evaluated on the validation/test set. The training results, including the predictions and evaluation metrics, are saved in the `outputs` directory for later analysis.
+2. **Model Training and Evaluation**: For each model specified in the `models` list, the model is trained on the training set and evaluated on the validation/test set. The training results, including the predictions, evaluation metrics, and summary report, are saved in the `outputs` directory for later analysis.
 
 ## Experiments and Performance Analysis
-9 models were trained on the Tunisian food dataset, and their performance was evaluated on the validation and test sets.
+Nine models were trained on the Tunisian food dataset, and their performance was evaluated on the validation and test sets.
+The configuration of the training experiment are as follows:
+- `img_size`: (640, 640)
+- `train_ratio`: 0.7
+- `val_ratio`: 0.15
+- `models`: [yolov8m-cls, yolov8l-cls, yolov8x-cls, yolo11m-cls, yolo11l-cls, yolo11x-cls, yolo26m-cls, yolo26l-cls, yolo26x-cls]
+- `batch_size`: 8
+- `epochs`: 12
+- `learning_rate`: 0.0001
+- `optimizer`: adamW
+- GPU: NVIDIA GeForce RTX 3060 (6 GB VRAM)
+- CPU: AMD Ryzen 5 5600H Processor
 
+
+### Train and validation loss curves for all models:
 <div style="text-align: center;">
     <img src="outputs/experiment_20260713_104836//train_val_loss.png" alt="Training and Validation Loss"/>
 </div>
+
+### Validation and test accuracy for all models:
+<div style="text-align: center;">
+    <img src="outputs/experiment_20260713_104836//metrics.png" alt="Validation and Test Accuracy"/>
+</div>
+
+As shown in the above figures, the best-performing models are the `x` variants of the YOLO family, achieving the highest accuracy on both the validation and test sets. This is expected since the `x` models have the largest capacity (more parameters and higher representational power), allowing them to learn more complex visual features from the dataset. Among them, **`yolo11x-cls` achieves the best performance with a 97% test accuracy**.
 
 ## Bring Your Own Dataset
 The project is **not limited to Tunisian food classification**. The entire training pipeline has been designed to be reusable for any image classification problem. Simply clone the repository and replace the dataset with your own.
