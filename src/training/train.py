@@ -51,6 +51,9 @@ class YoloTrainer:
             f"[TRAINING - {model_tracker.model_name}] Starting training with the following parameters: epochs={self.epochs}, imgsz={self.imgsz}, batch_size={self.batch_size}, learning_rate={self.learning_rate}, optimizer={self.optimizer}, device={'GPU' if self.device is not None else 'CPU'}, num_workers={self.num_workers}"
         )
 
+        if self.device is not None:
+            torch.cuda.empty_cache()
+
         try:
             model = YOLO(model_tracker.model_name)
             train_metrics = model.train(

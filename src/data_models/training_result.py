@@ -13,8 +13,9 @@ class TrainingTracker:
     model_name: str
     run_path: str
     time_taken: float = 0
-    val_accuracy_best: float = None
-    test_accuracy_best: float = None
+    val_predictions: list = None
+    val_metrics: dict = None
+    test_predictions: list = None
+    test_metrics: dict = None
     status: TrainStatus = TrainStatus.NOT_STARTED
     error_message: str = None
-    train_metrics: dict = None

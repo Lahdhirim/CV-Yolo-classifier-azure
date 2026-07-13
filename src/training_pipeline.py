@@ -65,14 +65,49 @@ class TrainingPipeline(BasePipeline):
         self.evaluator = Evaluator(data_path="./dataset", output_dir=self.output_dir)
 
     def _save_training_results(self) -> None:
-        """Save all training results as a pickle file."""
-        output_file = self.output_dir / "training_results.pkl"
+        """Save all training results as a pickle file and a TXT summary file."""
+        output_pkl_file = self.output_dir / "training_results.pkl"
+        output_txt_file = self.output_dir / "training_results.txt"
         try:
-            with output_file.open("wb") as file:
+
+            # Save training results as a pickle file
+            with output_pkl_file.open("wb") as file:
                 pickle.dump(self.training_results, file)
+
             logger.info(
-                f"[TRAINING] Training results saved successfully: {output_file}"
+                f"[TRAINING] Training results saved successfully: {output_pkl_file}"
             )
+
+            # Save training results summary as a TXT file
+            with output_txt_file.open("w", encoding="utf-8") as file:
+                file.write(f"Experiment: {self.experiment_id}\n")
+                file.write(
+                    f"Time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                )
+                file.write("=" * 60 + "\n\n")
+
+                for model_name, tracker in self.training_results.items():
+                    file.write(f"Model: {model_name}\n")
+                    file.write(f"Status: {tracker.status}\n")
+                    file.write(f"Training time: {tracker.time_taken:.2f} seconds\n")
+
+                    if tracker.status == TrainStatus.COMPLETED.value:
+                        test_accuracy = 0.0
+                        if tracker.test_metrics:
+                            test_accuracy = tracker.test_metrics.get(
+                                "accuracy",
+                                0.0,
+                            )
+                        file.write(f"Test accuracy: {test_accuracy:.2%}\n")
+
+                    else:
+                        error_message = (
+                            tracker.error_message or "Unknown training error"
+                        )
+                        file.write(f"Error: {error_message}\n")
+                    file.write("-" * 60 + "\n")
+
+            logger.info(f"[TRAINING] Training summary saved: {output_txt_file}")
 
         except (OSError, pickle.PickleError) as error:
             logger.exception(f"[TRAINING] Failed to save training results: {error}")
@@ -115,21 +150,19 @@ class TrainingPipeline(BasePipeline):
                     model_tracker=training_tracker, split="val"
                 )
                 val_metrics = self.evaluator.compute_metrics(predictions=val_preds)
+                training_tracker.val_predictions = val_preds
+                training_tracker.val_metrics = val_metrics
 
                 # Test Set
                 test_preds = self.evaluator.predict(
                     model_tracker=training_tracker, split="test"
                 )
                 test_metrics = self.evaluator.compute_metrics(predictions=test_preds)
+                training_tracker.test_predictions = test_preds
+                training_tracker.test_metrics = test_metrics
 
                 # Save Results in Excel file
-                self.evaluator.save_results_to_excel(
-                    model_tracker=training_tracker,
-                    val_predictions=val_preds,
-                    val_metrics=val_metrics,
-                    test_predictions=test_preds,
-                    test_metrics=test_metrics,
-                )
+                self.evaluator.save_results_to_excel(model_tracker=training_tracker)
 
             # Store the training result
             self.training_results[model_name] = training_tracker

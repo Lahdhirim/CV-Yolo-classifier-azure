@@ -135,10 +135,6 @@ class Evaluator:
     def save_results_to_excel(
         self,
         model_tracker: TrainingTracker,
-        val_predictions: list[dict],
-        val_metrics: dict,
-        test_predictions: list[dict],
-        test_metrics: dict,
     ) -> None:
         """Save predictions and metrics to a single Excel file."""
 
@@ -147,17 +143,19 @@ class Evaluator:
 
         output_file = results_dir / "evaluation.xlsx"
 
-        val_predictions_df = pd.DataFrame(val_predictions)
-        test_predictions_df = pd.DataFrame(test_predictions)
+        val_predictions_df = pd.DataFrame(model_tracker.val_predictions)
+        test_predictions_df = pd.DataFrame(model_tracker.test_predictions)
 
         val_metrics_df = pd.DataFrame(
             {
-                "Metric": ["Accuracy"],
-                "Value": [val_metrics["accuracy"]],
+                "Metric": ["Overall Accuracy"],
+                "Value": [model_tracker.val_metrics["accuracy"]],
             }
         )
 
-        for class_name, accuracy in val_metrics["per_class_accuracy"].items():
+        for class_name, accuracy in model_tracker.val_metrics[
+            "per_class_accuracy"
+        ].items():
             val_metrics_df.loc[len(val_metrics_df)] = [
                 f"Accuracy - {class_name}",
                 accuracy,
@@ -165,21 +163,27 @@ class Evaluator:
 
         test_metrics_df = pd.DataFrame(
             {
-                "Metric": ["Accuracy"],
-                "Value": [test_metrics["accuracy"]],
+                "Metric": ["Overall Accuracy"],
+                "Value": [model_tracker.test_metrics["accuracy"]],
             }
         )
 
-        for class_name, accuracy in test_metrics["per_class_accuracy"].items():
+        for class_name, accuracy in model_tracker.test_metrics[
+            "per_class_accuracy"
+        ].items():
             test_metrics_df.loc[len(test_metrics_df)] = [
                 f"Accuracy - {class_name}",
                 accuracy,
             ]
 
         # Confusion matrix
-        val_confusion_matrix = self._compute_confusion_matrix(val_predictions)
+        val_confusion_matrix = self._compute_confusion_matrix(
+            predictions=model_tracker.val_predictions
+        )
 
-        test_confusion_matrix = self._compute_confusion_matrix(test_predictions)
+        test_confusion_matrix = self._compute_confusion_matrix(
+            predictions=model_tracker.test_predictions
+        )
 
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             val_predictions_df.to_excel(

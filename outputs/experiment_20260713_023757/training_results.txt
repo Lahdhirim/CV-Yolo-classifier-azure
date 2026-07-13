@@ -1,0 +1,13 @@
+Experiment: experiment_20260713_023757
+============================================================
+
+Model: yolov8m-cls
+Status: Completed
+Training time: 72.22 seconds
+Test accuracy: 55.15%
+------------------------------------------------------------
+Model: yolov8l-cls
+Status: Completed
+Training time: 77.23 seconds
+Test accuracy: 47.88%
+------------------------------------------------------------
