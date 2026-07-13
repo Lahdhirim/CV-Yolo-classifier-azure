@@ -20,5 +20,5 @@ data_raw/
 dataset/
 notebooks/
 runs/
-stats.txt
 logs/
+outputs/
