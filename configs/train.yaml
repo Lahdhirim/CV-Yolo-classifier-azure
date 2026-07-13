@@ -11,7 +11,7 @@ data:
 training:
   models: [yolov8m-cls, yolov8l-cls, yolov8x-cls, yolo11m-cls, yolo11l-cls, yolo11x-cls, yolo26m-cls, yolo26l-cls, yolo26x-cls]
   batch_size: 8
-  epochs: 8
+  epochs: 12
   learning_rate: 0.0001
   optimizer: adamW
 

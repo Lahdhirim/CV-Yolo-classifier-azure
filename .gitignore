@@ -9,7 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
-# VS Code settings
+# Precommit files
 .ruff_cache/
 
 # Pytorch files
@@ -19,6 +19,4 @@ wheels/
 data_raw/
 dataset/
 notebooks/
-runs/
 logs/
-outputs/

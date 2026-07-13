@@ -1,0 +1,49 @@
+Experiment: experiment_20260713_104836
+Time: 2026-07-13 12:47:28
+============================================================
+
+Model: yolov8m-cls
+Status: Completed
+Training time: 643.34 seconds
+Test accuracy: 87.27%
+------------------------------------------------------------
+Model: yolov8l-cls
+Status: Completed
+Training time: 798.16 seconds
+Test accuracy: 90.91%
+------------------------------------------------------------
+Model: yolov8x-cls
+Status: Completed
+Training time: 1017.95 seconds
+Test accuracy: 95.76%
+------------------------------------------------------------
+Model: yolo11m-cls
+Status: Completed
+Training time: 656.43 seconds
+Test accuracy: 91.52%
+------------------------------------------------------------
+Model: yolo11l-cls
+Status: Completed
+Training time: 731.77 seconds
+Test accuracy: 93.94%
+------------------------------------------------------------
+Model: yolo11x-cls
+Status: Completed
+Training time: 880.14 seconds
+Test accuracy: 96.97%
+------------------------------------------------------------
+Model: yolo26m-cls
+Status: Completed
+Training time: 657.74 seconds
+Test accuracy: 93.33%
+------------------------------------------------------------
+Model: yolo26l-cls
+Status: Completed
+Training time: 734.27 seconds
+Test accuracy: 93.94%
+------------------------------------------------------------
+Model: yolo26x-cls
+Status: Completed
+Training time: 881.36 seconds
+Test accuracy: 95.76%
+------------------------------------------------------------
