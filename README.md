@@ -19,15 +19,15 @@ The dataset used in this project is a collection of images of Tunisian food dish
 
 | Assida | Baklava | Brik | Chapati |
 |:-------:|:----------:|:----:|:--------:|
-| <img src="imgs/assida.jpg" width="180"> | <img src="imgs/baklava.jpg" width="180"> | <img src="imgs/brik.jpg" width="180"> | <img src="imgs/chapati.jpg" width="180"> |
+| <img src="imgs/dataset_samples/assida.jpg" width="180"> | <img src="imgs/dataset_samples/baklava.jpg" width="180"> | <img src="imgs/dataset_samples/brik.jpg" width="180"> | <img src="imgs/dataset_samples/chapati.jpg" width="180"> |
 
 | Couscous | Fricasse | Ghraiba | Kaak Warka |
 |:---------:|:-------:|:--------:|:---------:|
-| <img src="imgs/couscous.jpg" width="180"> | <img src="imgs/fricasse.jpg" width="180"> | <img src="imgs/ghraiba.jpg" width="180"> | <img src="imgs/kaak_warka.jpg" width="180"> |
+| <img src="imgs/dataset_samples/couscous.jpg" width="180"> | <img src="imgs/dataset_samples/fricasse.jpg" width="180"> | <img src="imgs/dataset_samples/ghraiba.jpg" width="180"> | <img src="imgs/dataset_samples/kaak_warka.jpg" width="180"> |
 
 | Leblebi | Makroud | Mloukhia |
 |:----:|:--------------:|:------:|
-| <img src="imgs/lablebi.jpg" width="180"> | <img src="imgs/makroud.jpg" width="180"> | <img src="imgs/mloukhia.jpg" width="180"> |
+| <img src="imgs/dataset_samples/lablebi.jpg" width="180"> | <img src="imgs/dataset_samples/makroud.jpg" width="180"> | <img src="imgs/dataset_samples/mloukhia.jpg" width="180"> |
 
 The total 1100 images are split into training, validation, and test sets as follows:
 - Training set: 70% (770 images, with 70 images per class)
@@ -119,7 +119,7 @@ Once you have a labeled image dataset, the pipeline can be used for many image c
 
 ### 1. Install `uv`
 
-#### Linux / macOS
+#### Linux
 ```bash
 curl -Ls https://astral.sh/uv/install.sh | sh
 ```
@@ -138,3 +138,33 @@ uv sync
 ```bash
 uv run main.py train --config configs/train.yaml
 ```
+
+## Azure Deployment
+
+### 1. Install Azure CLI and log in to your Azure account
+
+1. Download and install the Azure CLI (Version 2.87.0) from the official GitHub release page: [https://github.com/Azure/azure-cli/releases#release-azure-cli-2.87.0](https://github.com/Azure/azure-cli/releases#release-azure-cli-2.87.0)
+
+> **Note (July 2026):** Avoid using the last Azure CLI version (**2.88.0**). Installing the Azure Machine Learning (`ml`) extension may fail due to a compatibility issue (`BackendUnavailable: Cannot import 'maturin'`). Use **Azure CLI 2.87.0** instead.
+
+2. Open PowerShell and run:
+
+    ```bash
+    az login
+    az extension add --name ml -y
+    ```
+
+### 2. Create your Azure resources
+1. Create a resource group (it is recommended to respect the name convention `rg-<project_name>-<environment>`):
+    ```bash
+    az group create --name rg-yolo-classifier-dev --location eastus
+    ```
+2. Create an Azure Machine Learning workspace:
+    ```bash
+    az ml workspace create 
+        --name yolo-classifier-ws 
+        --resource-group rg-yolo-classifier-dev 
+        --location eastus
+    ```
+
+    Note that Storage Account, Key Vault and Application Insights will be automatically created in the same resource group.
