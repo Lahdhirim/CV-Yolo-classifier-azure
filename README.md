@@ -155,7 +155,7 @@ uv run main.py train --config configs/train.yaml
     ```
 
 ### 2. Create your Azure resources
-1. Create a resource group (it is recommended to respect the name convention `rg-<project_name>-<environment>`):
+1. Create a resource group (it is recommended to follow the naming convention `rg-<project_name>-<environment>`):
     ```bash
     az group create --name rg-yolo-classifier-dev --location eastus
     ```
@@ -168,3 +168,18 @@ uv run main.py train --config configs/train.yaml
     ```
 
     Note that Storage Account, Key Vault and Application Insights will be automatically created in the same resource group.
+
+### 3. Set up deployment pipeline using GitHub Actions and Azure Microsoft Entra ID
+
+1. Use the command `az account show` to get your Azure subscription ID (`id`) and tenant ID (`tenantId`).
+2. Register a new application (e.g., `github-actions-yolo-classifier`) in Microsoft Entra ID and get its Application (client) ID. Normally, Directory (tenant) ID is the same as the tenant ID obtained in the previous step. This application will be used to authenticate GitHub Actions workflow runs with Azure resources within the Resource Group.
+3. Create a Federated Credential for the application in Microsoft Entra ID by selecting the scenario **GitHub Actions deploying Azure resources** as shown in the figure below. This credential tells Azure to trust workflow runs coming from this GitHub repository and that specific branch.
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/federated_creds.png" alt="Federated Credential Settings"/>
+</div>
+
+4. Assign the **Contributor** role to the registered application (`github-actions-yolo-classifier`) in your Azure resource group via the access control (IAM) settings. This will allow the application to manage resources.
+5. In your GitHub repository, go to `Settings` > `Secrets and variables` > `Actions` > `New repository secret`. Add the following secrets:
+   - `AZURE_CLIENT_ID`: The Application (client) ID of the registered application.
+   - `AZURE_TENANT_ID`: The Directory (tenant) ID of your Azure subscription.
+   - `AZURE_SUBSCRIPTION_ID`: The Subscription ID of your Azure subscription.
