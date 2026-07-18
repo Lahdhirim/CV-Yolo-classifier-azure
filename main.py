@@ -4,12 +4,22 @@ from pathlib import Path
 import typer
 import yaml
 
+from src.azure.azure_service import AzureService
 from src.model_registration_pipeline import RegistrationPipeline
 from src.training_pipeline import TrainingPipeline
 from src.utils.logger import logger
 
+# Initialize Typer CLI application
 app = typer.Typer(name="Yolo Classifier")
 logger.info("Starting YOLO Classifier CLI application.")
+
+# Initialize Azure Service Class
+azure_config = Path("configs/azure_service.yaml")
+with open(azure_config, "r") as f:
+    azure_service_config = yaml.safe_load(f)
+    logger.info(f"Loaded Azure service configuration: {azure_service_config}")
+azure_service = AzureService(config=azure_service_config)
+logger.info("Azure service initialized successfully.")
 
 
 @app.command(name="train")
@@ -61,7 +71,9 @@ def register_models(
     # Initialize and run the model registration pipeline
     start_time = time.time()
     logger.info("Running the model registration pipeline...")
-    pipeline = RegistrationPipeline(config=registration_config)
+    pipeline = RegistrationPipeline(
+        config=registration_config, azure_service=azure_service
+    )
     pipeline.run()
     end_time = time.time()
     logger.info(

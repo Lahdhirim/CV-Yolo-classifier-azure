@@ -36,4 +36,9 @@ logger = create_logger("main_logger", "logs/logs.log")
 training_logger = create_logger("training_logger", "logs/training.log", propagate=False)
 
 # Logger for model registration pipeline
+registration_logger = create_logger(
+    "registration_logger", "logs/registration.log", propagate=False
+)
+
+# Logger for Azure service
 azure_logger = create_logger("azure_logger", "logs/azure.log", propagate=False)
