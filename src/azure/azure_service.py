@@ -17,6 +17,7 @@ class AzureService:
         load_dotenv()
         self.subscription_id = os.environ["SUBSCRIPTION_ID"]
         self._initialize_service()
+        self.registered_models = self.get_registered_models()
 
     def _initialize_service(self) -> None:
         # Initialize Azure service based on the provided configuration
@@ -82,8 +83,33 @@ class AzureService:
                 description=f"Model registered from {model_path}",
             )
             self.client.models.create_or_update(model)
-            logger.info(f"[SUCCESS] Model '{model_name}' registered successfully.")
+            logger.info(
+                f"[REGISTER_MODEL] Model '{model_name}' registered successfully."
+            )
 
         except Exception as e:
-            logger.error(f"[ERROR] Failed to register model '{model_name}': {e}")
+            logger.error(
+                f"[REGISTER_MODEL] Failed to register model '{model_name}': {e}"
+            )
+            raise
+
+    def get_registered_models(self) -> list[Model]:
+        """Retrieve a list of registered models in Azure ML workspace."""
+
+        try:
+            models = list(self.client.models.list())
+            logger.info(
+                f"[GET_REGISTERED_MODELS] Found {len(models)} model(s) in Azure ML workspace '{self.workspace_name}'."
+            )
+
+            for model in models:
+                logger.info(
+                    f"[GET_REGISTERED_MODELS] Model Name: {model.name}, Latest Version: {model.latest_version}, ID: {model.id}, Created On: {model.creation_context.created_at}, Description: {model.description}"
+                )
+            return models
+
+        except Exception as e:
+            logger.error(
+                f"[GET_REGISTERED_MODELS] Failed to retrieve registered models: {e}"
+            )
             raise

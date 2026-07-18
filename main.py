@@ -13,7 +13,7 @@ from src.utils.logger import logger
 app = typer.Typer(name="Yolo Classifier")
 logger.info("Starting YOLO Classifier CLI application.")
 
-# Initialize Azure Service Class
+# Initialize Azure Service
 azure_config = Path("configs/azure_service.yaml")
 with open(azure_config, "r") as f:
     azure_service_config = yaml.safe_load(f)
