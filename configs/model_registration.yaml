@@ -1,0 +1,13 @@
+azure:
+  resource_group: rg-yolo-classifier-dev
+  workspace_name: yolo-classifier-ws
+
+models:
+  - name: yolov8x-cls
+    path: runs/classify/runs/yolov8x-cls_20260713_111303/weights/best.pt
+
+  - name: yolo11x-cls
+    path: runs/classify/runs/yolo11x-cls_20260713_111303/weights/best.pt
+
+  - name: yolo26x-cls
+    path: runs/classify/runs/yolo26x-cls_20260713_111303/weights/best.pt

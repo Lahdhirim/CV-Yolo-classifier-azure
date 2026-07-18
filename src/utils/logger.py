@@ -34,3 +34,6 @@ logger = create_logger("main_logger", "logs/logs.log")
 
 # Logger for training pipeline
 training_logger = create_logger("training_logger", "logs/training.log", propagate=False)
+
+# Logger for model registration pipeline
+azure_logger = create_logger("azure_logger", "logs/azure.log", propagate=False)

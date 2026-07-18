@@ -139,6 +139,11 @@ uv sync
 uv run main.py train --config configs/train.yaml
 ```
 
+### 4. Select the best models and run the model registration pipeline
+```bash
+uv run main.py register_models --config configs/model_registration.yaml 
+```
+
 ## Azure Deployment
 
 ### 1. Install Azure CLI and log in to your Azure account
