@@ -53,6 +53,11 @@ The main steps of the training pipeline are as follows:
 1. **Data Preprocessing**: The images are loaded from the `input_dir` directory and resized to the specified `img_size`. A new directory `dataset` is created to store three subdirectories: `train`, `val`, and `test`, each containing the corresponding images for training, validation, and testing.
 2. **Model Training and Evaluation**: For each model specified in the `models` list, the model is trained on the training set and evaluated on the validation/test set. The training results, including the predictions, evaluation metrics, and summary report, are saved in the `outputs` directory for later analysis.
 
+### [Model Registration Pipeline](src/model_registration_pipeline.py) ([Model Registration Configuration](configs/model_registration.yaml))
+
+The model registration pipeline is responsible for registering the best-performing models in the Azure Machine Learning workspace. It is used after selecting the best models. For now, the selection of the best models is done manually by analyzing the training results (done in [Model Selection Notebook](notebooks/model_selection.ipynb)). It is possible to automate this process by adding a model selection step in the training pipeline, allowing the best models to be selected and registered automatically based on predefined performance metrics and validation criteria.
+> See the example in the [Human Pose Classifier project](https://github.com/Lahdhirim/CV-human-pose-classifier-ViT-aws/blob/main/src/testing_pipeline.py#L102) where the best model is automatically registered to an Amazon S3 bucket after training process.
+
 ## Experiments and Performance Analysis
 Nine models were trained on the Tunisian food dataset, and their performance was evaluated on the validation and test sets.
 The configuration of the training experiment are as follows:
@@ -137,6 +142,11 @@ uv sync
 ### 3. Run the training pipeline
 ```bash
 uv run main.py train --config configs/train.yaml
+```
+
+### 4. Select the best models and run the model registration pipeline
+```bash
+uv run main.py register_models --config configs/model_registration.yaml 
 ```
 
 ## Azure Deployment

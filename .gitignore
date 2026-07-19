@@ -21,3 +21,6 @@ data_raw/
 dataset/
 logs/
 archive/
+
+# Environment files
+.env
