@@ -56,7 +56,7 @@ The main steps of the training pipeline are as follows:
 ### [Model Registration Pipeline](src/model_registration_pipeline.py) ([Model Registration Configuration](configs/model_registration.yaml))
 
 The model registration pipeline is responsible for registering the best-performing models in the Azure Machine Learning workspace. It is used after selecting the best models. For now, the selection of the best models is done manually by analyzing the training results (done in [Model Selection Notebook](notebooks/model_selection.ipynb)). It is possible to automate this process by adding a model selection step in the training pipeline, allowing the best models to be selected and registered automatically based on predefined performance metrics and validation criteria.
-> See the example in the [Human Pose Classifier project](https://github.com/Lahdhirim/CV-human-pose-classifier-ViT-aws/blob/main/src/testing_pipeline.py) where the best model is automatically registered to an Amazon S3 bucket after training process.
+> See the example in the [Human Pose Classifier project](https://github.com/Lahdhirim/CV-human-pose-classifier-ViT-aws/blob/main/src/testing_pipeline.py#L102) where the best model is automatically registered to an Amazon S3 bucket after training process.
 
 ## Experiments and Performance Analysis
 Nine models were trained on the Tunisian food dataset, and their performance was evaluated on the validation and test sets.
