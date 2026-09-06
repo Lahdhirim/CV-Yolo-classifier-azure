@@ -1,3 +1,0 @@
-azure:
-  resource_group: rg-yolo-classifier-dev
-  workspace_name: yolo-classifier-ws

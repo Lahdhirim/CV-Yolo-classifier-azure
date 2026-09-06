@@ -1,0 +1,3 @@
+model:
+  - name: yolo11x-cls
+    path: runs/classify/runs/yolo11x-cls_20260713_115356/weights/best.pt

@@ -35,10 +35,7 @@ logger = create_logger("main_logger", "logs/logs.log")
 # Logger for training pipeline
 training_logger = create_logger("training_logger", "logs/training.log", propagate=False)
 
-# Logger for model registration pipeline
-registration_logger = create_logger(
-    "registration_logger", "logs/registration.log", propagate=False
+# Logger for inference backend
+inference_logger = create_logger(
+    "inference_logger", "logs/inference.log", propagate=False
 )
-
-# Logger for Azure service
-azure_logger = create_logger("azure_logger", "logs/azure.log", propagate=False)

@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 from src.base_pipeline import BasePipeline
-from src.data_models.training_result import TrainingTracker, TrainStatus
+from src.models.training_result import TrainingTracker, TrainStatus
 from src.training.evaluate import Evaluator
 from src.training.preprocess import DatasetProcessor
 from src.training.train import YoloTrainer
@@ -120,8 +120,8 @@ class TrainingPipeline(BasePipeline):
         logger.info(f"Experiment output directory: {self.output_dir}")
 
         # Load and split the dataset
-        # self.dataset_processor.load_images()
-        # self.dataset_processor.split_dataset()
+        self.dataset_processor.load_images()
+        self.dataset_processor.split_dataset()
 
         # Train all the models
         assert Path(

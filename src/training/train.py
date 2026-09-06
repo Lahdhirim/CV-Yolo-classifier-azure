@@ -1,7 +1,7 @@
 import torch
 from ultralytics import YOLO
 
-from src.data_models.training_result import TrainingTracker, TrainStatus
+from src.models.training_result import TrainingTracker, TrainStatus
 from src.utils.logger import training_logger as logger
 
 

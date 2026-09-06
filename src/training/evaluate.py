@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 from ultralytics import YOLO
 
-from src.data_models.training_result import TrainingTracker
+from src.models.training_result import TrainingTracker
 from src.utils.logger import training_logger as logger
 
 
