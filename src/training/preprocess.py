@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 
@@ -6,7 +7,7 @@ from PIL import (
     ImageOps,
 )
 
-from src.utils.logger import training_logger as logger
+logger = logging.getLogger(__name__)
 
 
 class DatasetProcessor:

@@ -1,5 +1,11 @@
-2026-09-06 14:09:10,462 - inference_logger - INFO - Inference backend initialized.
-2026-09-06 14:09:10,572 - inference_logger - INFO - Inference configuration loaded: {'model': [{'name': 'yolo11x-cls', 'path': 'runs/classify/runs/yolo11x-cls_20260713_115356/weights/best.pt'}]}
-2026-09-06 14:09:10,572 - inference_logger - INFO - Model path: runs/classify/runs/yolo11x-cls_20260713_115356/weights/best.pt
-2026-09-06 14:09:13,414 - inference_logger - INFO - Model successfully initialized.
-2026-09-06 14:10:11,485 - inference_logger - INFO - Prediction result - Class: brik, Confidence: 0.9251186847686768
+2026-09-06 16:14:07,378 - inference_logger - INFO - Loaded Azure service configuration: {'azure': {'resource_group': 'rg-yolo-classifier-dev', 'workspace_name': 'yolo-classifier-ws'}}
+2026-09-06 16:14:13,538 - inference_logger - INFO - Azure service initialized successfully.
+2026-09-06 16:14:13,539 - inference_logger - INFO - FastAPI application initialized successfully.
+2026-09-06 16:14:13,540 - inference_logger - INFO - Inference configuration loaded: {'model': [{'name': 'yolo11x-cls', 'version': 10}]}
+2026-09-06 16:14:13,540 - inference_logger - INFO - Model name: yolo11x-cls, version: 10
+2026-09-06 16:14:14,602 - inference_logger - ERROR - Error initializing model: (UserError) The specified resource was not found.
+Code: UserError
+Message: The specified resource was not found.
+Exception Details:	(NoSuchModelRegistered) There is no registered model in Account Subscription: 41aade21-9b8c-4428-9433-e66ee55a599e, ResourceGroup: rg-yolo-classifier-dev, Workspace: yolo-classifier-ws with id yolo11x-cls:10
+	Code: NoSuchModelRegistered
+	Message: There is no registered model in Account Subscription: 41aade21-9b8c-4428-9433-e66ee55a599e, ResourceGroup: rg-yolo-classifier-dev, Workspace: yolo-classifier-ws with id yolo11x-cls:10

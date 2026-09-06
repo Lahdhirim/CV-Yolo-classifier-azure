@@ -179,7 +179,15 @@ uv run main.py register_models --config configs/model_registration.yaml
 
     Note that Storage Account, Key Vault and Application Insights will be automatically created in the same resource group.
 
-### 3. Set up deployment pipeline using GitHub Actions and Azure Microsoft Entra ID
+3. Create an Azure Container Registry:
+    ```bash
+    az acr create 
+        --resource-group rg-yolo-classifier-dev 
+        --name yoloclassifieracr 
+        --sku Basic
+    ```
+
+### 3. Assign roles and configure GitHub Actions for Azure authentication
 
 1. Use the command `az account show` to get your Azure subscription ID (`id`) and tenant ID (`tenantId`).
 2. Register a new application (e.g., `github-actions-yolo-classifier`) in Microsoft Entra ID and get its Application (client) ID. Normally, Directory (tenant) ID is the same as the tenant ID obtained in the previous step. This application will be used to authenticate GitHub Actions workflow runs with Azure resources within the Resource Group.
@@ -193,3 +201,5 @@ uv run main.py register_models --config configs/model_registration.yaml
    - `AZURE_CLIENT_ID`: The Application (client) ID of the registered application.
    - `AZURE_TENANT_ID`: The Directory (tenant) ID of your Azure subscription.
    - `AZURE_SUBSCRIPTION_ID`: The Subscription ID of your Azure subscription.
+
+> **Note :** This project uses a single Microsoft Entra application for GitHub Actions and assigns the **Contributor** role at the Resource Group scope. This simplifies the CI/CD setup because the same GitHub identity can interact with multiple Azure resources in the project, including the Azure Machine Learning workspace and Azure Container Registry (ACR). For a production environment, the recommended approach is to follow the principle of least privilege and assign only the roles required by each operation, scoped to the corresponding Azure resource.

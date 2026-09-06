@@ -4,12 +4,23 @@ from pathlib import Path
 import typer
 import yaml
 
+from src.azure.azure_service import AzureService
+from src.model_registration_pipeline import RegistrationPipeline
 from src.training_pipeline import TrainingPipeline
-from src.utils.logger import logger
+from src.utils.logger import create_logger
 
 # Initialize Typer CLI application
 app = typer.Typer(name="Yolo Classifier")
+logger = create_logger("main_logger", "logs/logs.log")
 logger.info("Starting YOLO Classifier CLI application.")
+
+# Initialize Azure Service
+azure_config = Path("configs/azure_service.yaml")
+with open(azure_config, "r") as f:
+    azure_service_config = yaml.safe_load(f)
+    logger.info(f"Loaded Azure service configuration: {azure_service_config}")
+azure_service = AzureService(config=azure_service_config)
+logger.info("Azure service initialized successfully.")
 
 
 @app.command(name="train")
@@ -39,6 +50,36 @@ def train(
     pipeline.run()
     end_time = time.time()
     logger.info(f"Training pipeline completed in {end_time - start_time:.2f} seconds.")
+
+
+@app.command(name="register_models")
+def register_models(
+    config: Path = typer.Option(
+        ...,
+        "--config",
+        "-c",
+        help="Path to the model registration configuration file.",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+    )
+) -> None:
+    with open(config, "r") as f:
+        registration_config = yaml.safe_load(f)
+    logger.info(f"Loaded model registration configuration: {registration_config}")
+
+    # Initialize and run the model registration pipeline
+    start_time = time.time()
+    logger.info("Running the model registration pipeline...")
+    pipeline = RegistrationPipeline(
+        config=registration_config, azure_service=azure_service
+    )
+    pipeline.run()
+    end_time = time.time()
+    logger.info(
+        f"Model registration pipeline completed in {end_time - start_time:.2f} seconds."
+    )
 
 
 if __name__ == "__main__":
