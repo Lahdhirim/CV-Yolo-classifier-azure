@@ -13,6 +13,8 @@ permissions:
 env:
   ACR_NAME: yoloclassifieracr
   IMAGE_NAME: tunisian-food-api
+  RESOURCE_GROUP: rg-yolo-classifier-dev
+  CONTAINER_APP_NAME: yolo-classifier-app
   
 jobs:
   deploy:
@@ -43,3 +45,10 @@ jobs:
         run: |
           docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+      
+      - name: Deploy to Azure Container App
+        run: |
+          az containerapp update \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}

@@ -162,6 +162,7 @@ uv run main.py register_models --config configs/model_registration.yaml
     ```bash
     az login
     az extension add --name ml -y
+    az extension add --name containerapp --upgrade
     ```
 
 ### 2. Create your Azure resources
@@ -187,6 +188,30 @@ uv run main.py register_models --config configs/model_registration.yaml
         --sku Basic
     ```
 
+4. Create an Azure Container App environment:
+    ```bash
+    az containerapp env create \
+        --name yolo-classifier-env \
+        --resource-group rg-yolo-classifier-dev \
+        --location eastus
+    ```
+
+5. Create an Azure Container App:
+    ```bash
+    az containerapp create \
+        --name yolo-classifier-app \
+        --resource-group rg-yolo-classifier-dev \
+        --environment yolo-classifier-env \
+        --image mcr.microsoft.com/k8se/quickstart:latest \
+        --target-port 8000 \
+        --ingress 'external' \
+    ```
+
+Normally, at this stage you should have your Azure resources set up and visible in the Azure portal as shown below:
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/resource_group.png" alt="Resource Group Overview"/>
+</div> 
+
 ### 3. Assign roles and configure GitHub Actions for Azure authentication
 
 1. Use the command `az account show` to get your Azure subscription ID (`id`) and tenant ID (`tenantId`).
@@ -203,3 +228,35 @@ uv run main.py register_models --config configs/model_registration.yaml
    - `AZURE_SUBSCRIPTION_ID`: The Subscription ID of your Azure subscription.
 
 > **Note :** This project uses a single Microsoft Entra application for GitHub Actions and assigns the **Contributor** role at the Resource Group scope. This simplifies the CI/CD setup because the same GitHub identity can interact with multiple Azure resources in the project, including the Azure Machine Learning workspace and Azure Container Registry (ACR). For a production environment, the recommended approach is to follow the principle of least privilege and assign only the roles required by each operation, scoped to the corresponding Azure resource.
+
+### 4. Assign roles needed for the Azure Container App
+The Azure Container App requires its own managed identity to securely access Azure resources at runtime without storing Azure credentials inside the container.
+
+1. Enable the managed identity for the Azure Container App (`yolo-classifier-app`) through the Azure portal or using the Azure CLI. This allows the app to securely access other Azure resources without needing to manage credentials manually.
+
+2. Assign the **AcrPull** role to the managed identity of the Azure Container App on the Azure Container Registry (`yoloclassifieracr`). This allows the Container App to pull the Docker image stored in the private ACR.
+
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/acr_pull_role.png" alt="ACR Pull Role Assignment (ACR)"/>
+</div>
+
+3. Assign the **Reader** role to the managed identity of the Azure Container App on the Azure Machine Learning workspace (`yolo-classifier-ws`). This allows the application to read Azure Machine Learning resources, including registered models.
+
+4. Assign the **Storage Blob Data Reader** role to the managed identity of the Azure Container App on the Storage Account associated with the Azure Machine Learning workspace. This allows the application to read the underlying model files stored in Azure Storage when downloading a registered model.
+
+5. Configure the Azure subscription ID as an environment variable in the Azure Container App:
+
+    ```bash
+    az containerapp update \
+        --name yolo-classifier-app \
+        --resource-group rg-yolo-classifier-dev \
+        --set-env-vars "SUBSCRIPTION_ID=<your-subscription-id>"
+    ```
+
+    The application uses this environment variable to initialize the Azure Machine Learning client:
+
+    ```python
+    self.subscription_id = os.environ["SUBSCRIPTION_ID"]
+    ```
+
+    > **Note:** `SUBSCRIPTION_ID` is configuration information, not an authentication credential. Authentication from the Container App to Azure services is handled by its **Managed Identity** through `DefaultAzureCredential`. Therefore, no Azure client secret or credentials need to be stored inside the container.
