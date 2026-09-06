@@ -20,7 +20,7 @@ with open("configs/inference.yaml", "r") as f:
 inference_logger.info(f"Inference configuration loaded: {inference_config}")
 
 # Initialize model
-model_path = inference_config["model"]["path"]
+model_path = inference_config["model"][0]["path"]
 inference_logger.info(f"Model path: {model_path}")
 try:
     model = YOLO(model_path)

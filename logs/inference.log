@@ -1,0 +1,5 @@
+2026-09-06 14:09:10,462 - inference_logger - INFO - Inference backend initialized.
+2026-09-06 14:09:10,572 - inference_logger - INFO - Inference configuration loaded: {'model': [{'name': 'yolo11x-cls', 'path': 'runs/classify/runs/yolo11x-cls_20260713_115356/weights/best.pt'}]}
+2026-09-06 14:09:10,572 - inference_logger - INFO - Model path: runs/classify/runs/yolo11x-cls_20260713_115356/weights/best.pt
+2026-09-06 14:09:13,414 - inference_logger - INFO - Model successfully initialized.
+2026-09-06 14:10:11,485 - inference_logger - INFO - Prediction result - Class: brik, Confidence: 0.9251186847686768
