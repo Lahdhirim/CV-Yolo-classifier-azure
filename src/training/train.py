@@ -1,8 +1,11 @@
+import logging
+
 import torch
 from ultralytics import YOLO
 
-from src.data_models.training_result import TrainingTracker, TrainStatus
-from src.utils.logger import training_logger as logger
+from src.models.training_result import TrainingTracker, TrainStatus
+
+logger = logging.getLogger(__name__)
 
 
 class YoloTrainer:

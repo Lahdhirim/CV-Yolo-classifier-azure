@@ -4,11 +4,13 @@ import time
 from pathlib import Path
 
 from src.base_pipeline import BasePipeline
-from src.data_models.training_result import TrainingTracker, TrainStatus
+from src.models.training_result import TrainingTracker, TrainStatus
 from src.training.evaluate import Evaluator
 from src.training.preprocess import DatasetProcessor
 from src.training.train import YoloTrainer
-from src.utils.logger import training_logger as logger
+from src.utils.logger import create_logger
+
+logger = create_logger("training_logger", "logs/training.log", propagate=False)
 
 
 class TrainingPipeline(BasePipeline):

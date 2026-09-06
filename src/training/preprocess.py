@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 
@@ -6,7 +7,7 @@ from PIL import (
     ImageOps,
 )
 
-from src.utils.logger import training_logger as logger
+logger = logging.getLogger(__name__)
 
 
 class DatasetProcessor:
@@ -97,7 +98,7 @@ class DatasetProcessor:
                 logger.info(
                     f"[SPLIT] Class: {classe}, Split: {split_name}, Number of images: {len(split_images)}"
                 )
-                split_dir = os.path.join("dataset", split_name, classe)
+                split_dir = os.path.join("dataset_2", split_name, classe)
                 os.makedirs(split_dir, exist_ok=True)
 
                 for image_index, image_name in enumerate(split_images):

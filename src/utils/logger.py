@@ -27,10 +27,3 @@ def create_logger(name: str, log_file: str, propagate: bool = True) -> logging.L
         logger.propagate = propagate
 
     return logger
-
-
-# Main application logger
-logger = create_logger("main_logger", "logs/logs.log")
-
-# Logger for training pipeline
-training_logger = create_logger("training_logger", "logs/training.log", propagate=False)

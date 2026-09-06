@@ -1,0 +1,3 @@
+model:
+  - name: yolo11x-cls
+    version: 4
