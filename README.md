@@ -205,6 +205,8 @@ uv run main.py register_models --config configs/model_registration.yaml
         --image mcr.microsoft.com/k8se/quickstart:latest \
         --target-port 8000 \
         --ingress 'external' \
+        --cpu 1.0 \
+        --memory 2.0Gi
     ```
 
 Normally, at this stage you should have your Azure resources set up and visible in the Azure portal as shown below:
