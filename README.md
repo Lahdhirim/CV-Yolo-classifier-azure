@@ -242,7 +242,7 @@ The Azure Container App requires its own managed identity to securely access Azu
     <img src="imgs//azure_tuto/acr_pull_role.png" alt="ACR Pull Role Assignment (ACR)"/>
 </div>
 
-3. Assign the **Reader** role to the managed identity of the Azure Container App on the Azure Machine Learning workspace (`yolo-classifier-ws`). This allows the application to read Azure Machine Learning resources, including registered models.
+3. Assign the **AzureML Data Scientist** role to the managed identity of the Azure Container App on the Azure Machine Learning workspace (`yolo-classifier-ws`). This allows the application to read Azure Machine Learning resources, including registered models.
 
 4. Assign the **Storage Blob Data Reader** role to the managed identity of the Azure Container App on the Storage Account associated with the Azure Machine Learning workspace. This allows the application to read the underlying model files stored in Azure Storage when downloading a registered model.
 
@@ -255,10 +255,4 @@ The Azure Container App requires its own managed identity to securely access Azu
         --set-env-vars "SUBSCRIPTION_ID=<your-subscription-id>"
     ```
 
-    The application uses this environment variable to initialize the Azure Machine Learning client:
-
-    ```python
-    self.subscription_id = os.environ["SUBSCRIPTION_ID"]
-    ```
-
-    > **Note:** `SUBSCRIPTION_ID` is configuration information, not an authentication credential. Authentication from the Container App to Azure services is handled by its **Managed Identity** through `DefaultAzureCredential`. Therefore, no Azure client secret or credentials need to be stored inside the container.
+    The application uses this environment variable to initialize the Azure Machine Learning client ([azure_service.py](src/azure/azure_service.py#L20)).
