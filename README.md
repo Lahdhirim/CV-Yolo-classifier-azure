@@ -256,3 +256,9 @@ The Azure Container App requires its own managed identity to securely access Azu
     ```
 
     The application uses this environment variable to initialize the Azure Machine Learning client ([azure_service.py](src/azure/azure_service.py#L20)).
+
+The following diagram provides an overview of the complete Azure deployment architecture, summarizing the CI/CD workflow, Azure resources, authentication mechanisms, and role assignments described in the previous steps:
+
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/azure_deployment_architecture.png" alt="Azure Deployment Architecture"/>
+</div>
