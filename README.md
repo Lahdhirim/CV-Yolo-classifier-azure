@@ -1,4 +1,4 @@
-# YOLO Classification Fine-Tuning (Under Development 🚧)
+# YOLO Classification Fine-Tuning (Azure Deployment)
 
 This project provides a simple and reproducible pipeline for fine-tuning the **YOLO Classification (YOLO-CLS)** models on custom image classification datasets.
 
