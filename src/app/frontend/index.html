@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tunisian Food Classifier</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <div class="flag">🇹🇳</div>
+            <h1>Tunisian Food Classifier</h1>
+            <p>
+                Upload a photo of a Tunisian dish and let the AI identify it.
+            </p>
+        </header>
+
+        <section class="card">
+
+            <label for="image-input" class="upload-zone" id="upload-zone">
+
+                <div class="upload-icon">↑</div>
+
+                <div class="upload-text">
+                    <strong>Choose an image</strong>
+                    <span>JPG, JPEG or PNG</span>
+                </div>
+
+                <input
+                    id="image-input"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                >
+
+            </label>
+
+            <div id="preview-container" class="preview-container hidden">
+                <img id="image-preview" alt="Selected food">
+            </div>
+
+            <button id="predict-button">
+                <span id="button-text">Classify dish</span>
+            </button>
+
+            <div id="result" class="result hidden">
+
+                <span class="result-label">Prediction</span>
+
+                <h2 id="prediction"></h2>
+
+                <div class="confidence-header">
+                    <span>Confidence</span>
+                    <span id="confidence-value"></span>
+                </div>
+
+                <div class="confidence-bar">
+                    <div id="confidence-fill"></div>
+                </div>
+
+            </div>
+
+            <p id="error" class="error"></p>
+
+        </section>
+
+        <footer>
+            Powered by YOLO · FastAPI · Azure
+        </footer>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+</html>

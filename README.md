@@ -196,18 +196,38 @@ uv run main.py register_models --config configs/model_registration.yaml
         --location eastus
     ```
 
-5. Create an Azure Container App:
+5. Create an Azure Container App for Backend:
     ```bash
     az containerapp create \
-        --name yolo-classifier-app \
+        --name yolo-classifier-backend \
         --resource-group rg-yolo-classifier-dev \
         --environment yolo-classifier-env \
         --image mcr.microsoft.com/k8se/quickstart:latest \
         --target-port 8000 \
-        --ingress 'external' \
+        --ingress internal \
         --cpu 1.0 \
         --memory 2.0Gi
     ```
+    Note that the backend uses internal ingress, which prevents it from being accessed
+    directly from the public internet. It is intended to receive API requests
+    from the frontend Container App within the same Azure Container Apps
+    environment.
+
+6. Create an Azure Container App for Frontend:
+    ```bash
+    az containerapp create \
+        --name yolo-classifier-frontend \
+        --resource-group rg-yolo-classifier-dev \
+        --environment yolo-classifier-env \
+        --image mcr.microsoft.com/k8se/quickstart:latest \
+        --target-port 80 \
+        --ingress external \
+        --cpu 0.5 \
+        --memory 1.0Gi
+    ```
+    The frontend uses external ingress and therefore acts as the public entry
+    point of the application. It serves the web interface through Nginx and
+    forwards API requests to the backend Container App.
 
 Normally, at this stage you should have your Azure resources set up and visible in the Azure portal as shown below:
 <div style="text-align: center;">
@@ -231,10 +251,10 @@ Normally, at this stage you should have your Azure resources set up and visible 
 
 > **Note :** This project uses a single Microsoft Entra application for GitHub Actions and assigns the **Contributor** role at the Resource Group scope. This simplifies the CI/CD setup because the same GitHub identity can interact with multiple Azure resources in the project, including the Azure Machine Learning workspace and Azure Container Registry (ACR). For a production environment, the recommended approach is to follow the principle of least privilege and assign only the roles required by each operation, scoped to the corresponding Azure resource.
 
-### 4. Assign roles needed for the Azure Container App
-The Azure Container App requires its own managed identity to securely access Azure resources at runtime without storing Azure credentials inside the container.
+### 4. Assign roles needed for the Azure Container App `yolo-classifier-backend`
+The Azure Container App `yolo-classifier-backend` requires its own managed identity to securely access Azure resources at runtime without storing Azure credentials inside the container.
 
-1. Enable the managed identity for the Azure Container App (`yolo-classifier-app`) through the Azure portal or using the Azure CLI. This allows the app to securely access other Azure resources without needing to manage credentials manually.
+1. Enable the **system-assigned managed identity** for the Azure Container App through the Azure portal (`yolo-classifier-backend` > `Security` > `Identity` > `System assigned` > `On`).
 
 2. Assign the **AcrPull** role to the managed identity of the Azure Container App on the Azure Container Registry (`yoloclassifieracr`). This allows the Container App to pull the Docker image stored in the private ACR.
 
@@ -250,9 +270,19 @@ The Azure Container App requires its own managed identity to securely access Azu
 
     ```bash
     az containerapp update \
-        --name yolo-classifier-app \
+        --name yolo-classifier-backend \
         --resource-group rg-yolo-classifier-dev \
         --set-env-vars "SUBSCRIPTION_ID=<your-subscription-id>"
     ```
 
     The application uses this environment variable to initialize the Azure Machine Learning client ([azure_service.py](src/azure/azure_service.py#L20)).
+
+
+### 5. Assign roles needed for the Azure Container App `yolo-classifier-frontend`
+Enable the **system-assigned managed identity** for the Azure Container App (`yolo-classifier-frontend`) and assign the **AcrPull** role to it on the Azure Container Registry. This allows the frontend application to pull its Docker image from the registry.
+
+The following diagram provides an overview of the complete Azure deployment architecture, summarizing the CI/CD workflow, Azure resources, authentication mechanisms, and role assignments described in the previous steps:
+
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/azure_deployment_architecture.png" alt="Azure Deployment Architecture"/>
+</div>
