@@ -162,6 +162,7 @@ uv run main.py register_models --config configs/model_registration.yaml
     ```bash
     az login
     az extension add --name ml -y
+    az extension add --name containerapp --upgrade
     ```
 
 ### 2. Create your Azure resources
@@ -187,6 +188,52 @@ uv run main.py register_models --config configs/model_registration.yaml
         --sku Basic
     ```
 
+4. Create an Azure Container App environment:
+    ```bash
+    az containerapp env create \
+        --name yolo-classifier-env \
+        --resource-group rg-yolo-classifier-dev \
+        --location eastus
+    ```
+
+5. Create an Azure Container App for Backend:
+    ```bash
+    az containerapp create \
+        --name yolo-classifier-backend \
+        --resource-group rg-yolo-classifier-dev \
+        --environment yolo-classifier-env \
+        --image mcr.microsoft.com/k8se/quickstart:latest \
+        --target-port 8000 \
+        --ingress internal \
+        --cpu 1.0 \
+        --memory 2.0Gi
+    ```
+    Note that the backend uses internal ingress, which prevents it from being accessed
+    directly from the public internet. It is intended to receive API requests
+    from the frontend Container App within the same Azure Container Apps
+    environment.
+
+6. Create an Azure Container App for Frontend:
+    ```bash
+    az containerapp create \
+        --name yolo-classifier-frontend \
+        --resource-group rg-yolo-classifier-dev \
+        --environment yolo-classifier-env \
+        --image mcr.microsoft.com/k8se/quickstart:latest \
+        --target-port 80 \
+        --ingress external \
+        --cpu 0.5 \
+        --memory 1.0Gi
+    ```
+    The frontend uses external ingress and therefore acts as the public entry
+    point of the application. It serves the web interface through Nginx and
+    forwards API requests to the backend Container App.
+
+Normally, at this stage you should have your Azure resources set up and visible in the Azure portal as shown below:
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/resource_group.png" alt="Resource Group Overview"/>
+</div> 
+
 ### 3. Assign roles and configure GitHub Actions for Azure authentication
 
 1. Use the command `az account show` to get your Azure subscription ID (`id`) and tenant ID (`tenantId`).
@@ -203,3 +250,39 @@ uv run main.py register_models --config configs/model_registration.yaml
    - `AZURE_SUBSCRIPTION_ID`: The Subscription ID of your Azure subscription.
 
 > **Note :** This project uses a single Microsoft Entra application for GitHub Actions and assigns the **Contributor** role at the Resource Group scope. This simplifies the CI/CD setup because the same GitHub identity can interact with multiple Azure resources in the project, including the Azure Machine Learning workspace and Azure Container Registry (ACR). For a production environment, the recommended approach is to follow the principle of least privilege and assign only the roles required by each operation, scoped to the corresponding Azure resource.
+
+### 4. Assign roles needed for the Azure Container App `yolo-classifier-backend`
+The Azure Container App `yolo-classifier-backend` requires its own managed identity to securely access Azure resources at runtime without storing Azure credentials inside the container.
+
+1. Enable the **system-assigned managed identity** for the Azure Container App through the Azure portal (`yolo-classifier-backend` > `Security` > `Identity` > `System assigned` > `On`).
+
+2. Assign the **AcrPull** role to the managed identity of the Azure Container App on the Azure Container Registry (`yoloclassifieracr`). This allows the Container App to pull the Docker image stored in the private ACR.
+
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/acr_pull_role.png" alt="ACR Pull Role Assignment (ACR)"/>
+</div>
+
+3. Assign the **AzureML Data Scientist** role to the managed identity of the Azure Container App on the Azure Machine Learning workspace (`yolo-classifier-ws`). This allows the application to read Azure Machine Learning resources, including registered models.
+
+4. Assign the **Storage Blob Data Reader** role to the managed identity of the Azure Container App on the Storage Account associated with the Azure Machine Learning workspace. This allows the application to read the underlying model files stored in Azure Storage when downloading a registered model.
+
+5. Configure the Azure subscription ID as an environment variable in the Azure Container App:
+
+    ```bash
+    az containerapp update \
+        --name yolo-classifier-backend \
+        --resource-group rg-yolo-classifier-dev \
+        --set-env-vars "SUBSCRIPTION_ID=<your-subscription-id>"
+    ```
+
+    The application uses this environment variable to initialize the Azure Machine Learning client ([azure_service.py](src/azure/azure_service.py#L20)).
+
+
+### 5. Assign roles needed for the Azure Container App `yolo-classifier-frontend`
+Enable the **system-assigned managed identity** for the Azure Container App (`yolo-classifier-frontend`) and assign the **AcrPull** role to it on the Azure Container Registry. This allows the frontend application to pull its Docker image from the registry.
+
+The following diagram provides an overview of the complete Azure deployment architecture, summarizing the CI/CD workflow, Azure resources, authentication mechanisms, and role assignments described in the previous steps:
+
+<div style="text-align: center;">
+    <img src="imgs//azure_tuto/azure_deployment_architecture.png" alt="Azure Deployment Architecture"/>
+</div>
