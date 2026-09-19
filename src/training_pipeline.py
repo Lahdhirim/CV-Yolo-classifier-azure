@@ -122,8 +122,8 @@ class TrainingPipeline(BasePipeline):
         logger.info(f"Experiment output directory: {self.output_dir}")
 
         # Load and split the dataset
-        # self.dataset_processor.load_images()
-        # self.dataset_processor.split_dataset()
+        self.dataset_processor.load_images()
+        self.dataset_processor.split_dataset()
 
         # Train all the models
         assert Path(
