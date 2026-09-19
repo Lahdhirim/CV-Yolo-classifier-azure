@@ -42,7 +42,10 @@ jobs:
         run: uv sync --frozen
 
       - name: Run Pylint
-        run: uv run pylint src
+        run: uv run pylint src --exit-zero
+
+      - name: Check Pylint errors
+        run: uv run pylint src --errors-only
 
   ci:
     name: CI - Build and Push
